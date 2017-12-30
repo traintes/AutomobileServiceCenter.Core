@@ -51,6 +51,9 @@ namespace ASC.Web
             services.AddOptions();
             services.Configure<ApplicationSettings>(Configuration.GetSection("AppSettings"));
 
+            services.AddDistributedMemoryCache();
+            services.AddSession();
+
             services.AddMvc();
 
             // Add application services.
@@ -75,6 +78,7 @@ namespace ASC.Web
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseSession();
             app.UseStaticFiles();
 
             app.UseIdentity();

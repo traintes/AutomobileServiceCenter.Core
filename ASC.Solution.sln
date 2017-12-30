@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASC.Utilities", "ASC.Utilit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureStorageTest", "AzureStorageTest\AzureStorageTest.csproj", "{BA883BBF-7D69-4CA2-90B0-983B4395900F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASC.Tests", "ASC.Tests\ASC.Tests.csproj", "{048C1B97-DC02-4DE8-B83C-9E91F72BC1CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{BA883BBF-7D69-4CA2-90B0-983B4395900F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA883BBF-7D69-4CA2-90B0-983B4395900F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA883BBF-7D69-4CA2-90B0-983B4395900F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{048C1B97-DC02-4DE8-B83C-9E91F72BC1CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{048C1B97-DC02-4DE8-B83C-9E91F72BC1CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{048C1B97-DC02-4DE8-B83C-9E91F72BC1CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{048C1B97-DC02-4DE8-B83C-9E91F72BC1CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
