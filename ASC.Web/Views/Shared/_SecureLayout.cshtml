@@ -1,5 +1,10 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http;
+@using ASC.Utilities;
+@inject IHttpContextAccessor UserHttpContext;
+
+@{
     Layout = "_MasterLayout";
+    CurrentUser currentUser = this.UserHttpContext.HttpContext.User.GetCurrentUserDetails();
 }
 
 <!-- Header -->
@@ -27,10 +32,10 @@
                     <img class="circle" src="~/images/male.png" />
                 </a>
                 <a href="#!name">
-                    <span class="white-text name">John Doe</span>
+                    <span class="white-text name">@currentUser.Name</span>
                 </a>
                 <a href="#!email">
-                    <span class="white-text email">jdandturk@gmail.com</span>
+                    <span class="white-text email">@currentUser.Email</span>
                 </a>
             </div>
         </li>
@@ -72,12 +77,30 @@
             </a>
         </li>
         <li>
+            <ul class="collapsible collapsible-accordion">
+                <li>
+                    <a class="collapsible-header">
+                        Settings<i class="material-icons">settings</i>
+                    </a>
+                    <div class="collapsible-body">
+                        <ul>
+                            <li>
+                                <a class="collapsible-header" href="#!" id="ancrResetPassword">
+                                    Reset Password<i class="material-icons">lock_outline</i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        @*<li>
             <a class="collapsible-header" href="#!">
                 <i class="material-icons">settings</i>Settings
             </a>
-        </li>
+        </li>*@
         <li>
-            <a class="collapsible-header" href="#!">
+            <a class="collapsible-header" href="#!" id="ancrLogout">
                 <i class="material-icons">exit_to_app</i>Logout
             </a>
         </li>
@@ -132,3 +155,23 @@
         </div>
     </div>
 </footer>
+
+<form class="hide" method="post" id="logout_form" asp-controller="Account" asp-action="Logout">
+    <input type="submit" value="Logout" />
+</form>
+
+<form class="hide" method="post" id="resetPassword_form" asp-controller="Account"
+    asp-action="InitiateResetPassword"></form>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+    <script type="text/javascript">
+        $('#ancrLogout').click(function () {
+            $('#logout_form').submit();
+        });
+
+        $('#ancrResetPassword').click(function () {
+            $('#resetPassword_form').submit();
+        });
+    </script>
+}

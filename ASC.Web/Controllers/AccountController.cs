@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using ASC.Web.Models;
 using ASC.Web.Models.AccountViewModels;
 using ASC.Web.Services;
+using ASC.Utilities;
 
 namespace ASC.Web.Controllers
 {
@@ -64,21 +65,44 @@ namespace ASC.Web.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
+                // This doesn't count login failures toward account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                ApplicationUser user = await this._userManager.FindByEmailAsync(model.Email);
+                if(user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return View(model);
+                }
+
+                bool isActive = Boolean.Parse(user.Claims
+                    .SingleOrDefault(p => p.ClaimType == "IsActive").ClaimValue);
+                if (!isActive)
+                {
+                    ModelState.AddModelError(string.Empty, "Account has been locked.");
+                    return View(model);
+                }
+
+                Microsoft.AspNetCore.Identity.SignInResult result = await this._signInManager
+                    .PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation(1, "User logged in.");
-                    return RedirectToLocal(returnUrl);
+                    this._logger.LogInformation(1, "User logged in.");
+                    if (!string.IsNullOrWhiteSpace(returnUrl))
+                        return RedirectToLocal(returnUrl);
+                    else
+                        return RedirectToAction("Dashboard", "Dashboard");
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    return RedirectToAction(nameof(SendCode), new
+                    {
+                        ReturnUrl = returnUrl,
+                        RememberMe = model.RememberMe,
+                    });
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning(2, "User account locked out.");
+                    this._logger.LogWarning(2, "User account locked out.");
                     return View("Lockout");
                 }
                 else
@@ -87,7 +111,6 @@ namespace ASC.Web.Controllers
                     return View(model);
                 }
             }
-
             // If we got this far, something failed, redisplay form
             return View(model);
         }
@@ -139,8 +162,8 @@ namespace ASC.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
-            _logger.LogInformation(4, "User logged out.");
+            await this._signInManager.SignOutAsync();
+            this._logger.LogInformation(4, "User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
@@ -299,6 +322,30 @@ namespace ASC.Web.Controllers
         }
 
         //
+        // POST: /Account/ResetPassword
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> InitiateResetPassword()
+        {
+            // Find User
+            string userEmail = HttpContext.User.GetCurrentUserDetails().Email;
+            ApplicationUser user = await this._userManager.FindByEmailAsync(userEmail);
+
+            // Generate User code
+            var code = this._userManager.GeneratePasswordResetTokenAsync(user);
+            var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new
+            {
+                userId = user.Id,
+                code = code,
+            }, protocol: HttpContext.Request.Scheme);
+
+            // Send Email
+            await this._emailSender.SendEmailAsync(userEmail, "Reset Password",
+                $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+            return View("ResetPasswordEmailConfirmation");
+        }
+
+        //
         // GET: /Account/ResetPassword
         [HttpGet]
         [AllowAnonymous]
@@ -315,20 +362,24 @@ namespace ASC.Web.Controllers
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
-            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            ApplicationUser user = await this._userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
                 // Don't reveal that the user does not exist
                 return RedirectToAction(nameof(AccountController.ResetPasswordConfirmation), "Account");
             }
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+
+            IdentityResult result = await this._userManager.ResetPasswordAsync(user, model.Code, model.Password);
             if (result.Succeeded)
             {
+                if (HttpContext.User.Identity.IsAuthenticated)
+                    await this._signInManager.SignOutAsync();
+
                 return RedirectToAction(nameof(AccountController.ResetPasswordConfirmation), "Account");
             }
+
             AddErrors(result);
             return View();
         }

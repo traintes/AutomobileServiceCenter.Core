@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace ASC.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : AnonymousController
     {
         private IOptions<ApplicationSettings> _settings;
 
@@ -28,11 +28,6 @@ namespace ASC.Web.Controllers
             // Usage of IOptions
             ViewBag.Title = this._settings.Value.ApplicationTitle;
 
-            return View();
-        }
-
-        public IActionResult Dashboard()
-        {
             return View();
         }
 
