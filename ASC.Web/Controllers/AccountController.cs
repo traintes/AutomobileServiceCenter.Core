@@ -332,16 +332,15 @@ namespace ASC.Web.Controllers
             ApplicationUser user = await this._userManager.FindByEmailAsync(userEmail);
 
             // Generate User code
-            var code = this._userManager.GeneratePasswordResetTokenAsync(user);
-            var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new
-            {
+            string code = await this._userManager.GeneratePasswordResetTokenAsync(user);
+            string callbackUrl = Url.Action(nameof(ResetPassword), "Account", new {
                 userId = user.Id,
                 code = code,
             }, protocol: HttpContext.Request.Scheme);
 
             // Send Email
             await this._emailSender.SendEmailAsync(userEmail, "Reset Password",
-                $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+               $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
             return View("ResetPasswordEmailConfirmation");
         }
 
