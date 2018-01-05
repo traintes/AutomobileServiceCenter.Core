@@ -13,6 +13,8 @@ using ASC.Web.Models;
 using ASC.Web.Models.AccountViewModels;
 using ASC.Web.Services;
 using ASC.Utilities;
+using ASC.Models.BaseTypes;
+using ElCamino.AspNetCore.Identity.AzureTable.Model;
 
 namespace ASC.Web.Controllers
 {
@@ -292,20 +294,23 @@ namespace ASC.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                ApplicationUser user = await this._userManager.FindByEmailAsync(model.Email);
+                if (user == null || !(await this._userManager.IsEmailConfirmedAsync(user)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation");
+                    return View("ResetPasswordEmailConfirmation");
                 }
 
-                // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=532713
                 // Send an email with this link
-                //var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                //var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                //await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-                //   $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                //return View("ForgotPasswordConfirmation");
+                string code = await this._userManager.GeneratePasswordResetTokenAsync(user);
+                string callbackUrl = Url.Action(nameof(ResetPassword), "Account", new
+                {
+                    userId = user.Id,
+                    code = code,
+                }, protocol: HttpContext.Request.Scheme);
+                await this._emailSender.SendEmailAsync(model.Email, "Reset Password",
+                    $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>.");
+                return View("ResetPasswordEmailConfirmation");
             }
 
             // If we got this far, something failed, redisplay form
@@ -499,6 +504,112 @@ namespace ASC.Web.Controllers
         public IActionResult AccessDenied()
         {
             return View();
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ServiceEngineers()
+        {
+            IEnumerable<ApplicationUser> serviceEngineers = await this._userManager
+                .GetUsersInRoleAsync(Roles.Engineer.ToString());
+
+            // Hold all service engineers in session
+            HttpContext.Session.SetSession("ServiceEngineers", serviceEngineers);
+
+            return View(new ServiceEngineerViewModel
+            {
+                ServiceEngineers = serviceEngineers != null ? serviceEngineers.ToList() : null,
+                Registration = new ServiceEngineerRegistrationViewModel() { IsEdit = false },
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ServiceEngineers(ServiceEngineerViewModel serviceEngineer)
+        {
+            serviceEngineer.ServiceEngineers = HttpContext.Session
+                .GetSession<List<ApplicationUser>>("ServiceEngineers");
+
+            if (!ModelState.IsValid)
+                return View(serviceEngineer);
+
+            if (serviceEngineer.Registration.IsEdit)
+            {
+                // Update user
+                ApplicationUser user = await this._userManager
+                    .FindByEmailAsync(serviceEngineer.Registration.Email);
+                user.UserName = serviceEngineer.Registration.UserName;
+                IdentityResult result = await this._userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                {
+                    result.Errors.ToList().ForEach(p => ModelState.AddModelError("", p.Description));
+                    return View(serviceEngineer);
+                }
+
+                // Update Password
+                string token = await this._userManager.GeneratePasswordResetTokenAsync(user);
+                IdentityResult passwordResult = await this._userManager
+                    .ResetPasswordAsync(user, token, serviceEngineer.Registration.Password);
+                if (!passwordResult.Succeeded)
+                {
+                    passwordResult.Errors.ToList().ForEach(p => ModelState.AddModelError("", p.Description));
+                    return View(serviceEngineer);
+                }
+
+                // Update claims
+                // user = await _userManager.FindByEmailAsync(serviceEngineer.Registration.Email);
+                IdentityUserClaim isActiveClaim = user.Claims.SingleOrDefault(p => p.ClaimType == "IsActive");
+                IdentityResult removeClaimResult = await this._userManager.RemoveClaimAsync(user,
+                    new Claim(isActiveClaim.ClaimType, isActiveClaim.ClaimValue));
+                IdentityResult addClaimResult = await this._userManager.AddClaimAsync(user,
+                    new Claim(isActiveClaim.ClaimType, serviceEngineer.Registration.IsActive.ToString()));
+            }
+            else
+            {
+                // Create User
+                ApplicationUser user = new ApplicationUser
+                {
+                    UserName = serviceEngineer.Registration.UserName,
+                    Email = serviceEngineer.Registration.Email,
+                    EmailConfirmed = true,
+                };
+
+                IdentityResult result = await this._userManager
+                    .CreateAsync(user, serviceEngineer.Registration.Password);
+                await this._userManager.AddClaimAsync(user,
+                    new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+                    serviceEngineer.Registration.Email));
+                await this._userManager.AddClaimAsync(user,
+                    new Claim("IsActive", serviceEngineer.Registration.IsActive.ToString()));
+                if (!result.Succeeded)
+                {
+                    result.Errors.ToList().ForEach(p => ModelState.AddModelError("", p.Description));
+                    return View(serviceEngineer);
+                }
+
+                // Assign user to Engineer Role
+                IdentityResult roleResult = await this._userManager.AddToRoleAsync(user, Roles.Engineer.ToString());
+                if (!roleResult.Succeeded)
+                {
+                    roleResult.Errors.ToList().ForEach(p => ModelState.AddModelError("", p.Description));
+                    return View(serviceEngineer);
+                }
+            }
+
+            if (serviceEngineer.Registration.IsActive)
+            {
+                await this._emailSender.SendEmailAsync(serviceEngineer.Registration.Email,
+                    "Account Created/Modified",
+                    $"Email: {serviceEngineer.Registration.Email}\nPassword: {serviceEngineer.Registration.Password}");
+            }
+            else
+            {
+                await this._emailSender.SendEmailAsync(serviceEngineer.Registration.Email,
+                    "Account Deactivated", "Your account has been deactivated.");
+            }
+
+            return RedirectToAction("ServiceEngineers");
         }
 
         #region Helpers

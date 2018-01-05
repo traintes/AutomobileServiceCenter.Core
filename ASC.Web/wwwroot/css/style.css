@@ -117,3 +117,19 @@ header.secureLayout, main.secureLayout, footer.secureLayout {
 .margin-bottom-50px {
   margin-bottom: 50px;
 }
+
+.padding-bottom-15px {
+  padding-bottom: 15px !important;
+}
+
+.cursor-hand {
+  cursor: pointer;
+}
+
+
+/* Bugfix for non-clickable checkboxes in Materialize
+  See: https://github.com/Dogfalo/materialize/issues/5062
+*/
+.input-field label {
+  pointer-events: auto;
+}
