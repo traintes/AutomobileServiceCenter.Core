@@ -133,3 +133,7 @@ header.secureLayout, main.secureLayout, footer.secureLayout {
 .input-field label {
   pointer-events: auto;
 }
+
+.padding-top-20px {
+  padding-top: 20px;
+}

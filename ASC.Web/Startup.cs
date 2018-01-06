@@ -97,8 +97,13 @@ namespace ASC.Web
 
             app.UseSession();
             app.UseStaticFiles();
-
             app.UseIdentity();
+
+            app.UseGoogleAuthentication(new GoogleOptions()
+            {
+                ClientId = Configuration["Google:Identity:ClientId"],
+                ClientSecret = Configuration["Google:Identity:ClientSecret"],
+            });
 
             // Add external authentication middleware below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715
 

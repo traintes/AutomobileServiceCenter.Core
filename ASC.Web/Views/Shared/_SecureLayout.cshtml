@@ -53,8 +53,11 @@
                     </a>
                     <div class="collapsible-body">
                         <ul>
-                            <li><a href="#!">Customers<i class="material-icons">account_box</i></a></li>
-                            @*<li><a href="#!">Deactivate Customer<i class="material-icons">remove_circle</i></a></li>*@
+                            <li>
+                                <a asp-controller="Account" asp-action="Customers">
+                                    Customers <i class="material-icons">account_box</i>
+                                </a>
+                            </li>
                             <li>
                                 <a asp-controller="Account" asp-action="ServiceEngineers">
                                     Service Engineers <i class="material-icons">person_add</i>
@@ -89,8 +92,13 @@
                     <div class="collapsible-body">
                         <ul>
                             <li>
+                                <a asp-controller="Account" asp-action="Profile" class="collapsible-header">
+                                    Profile <i class="material-icons">system_update_alt</i>
+                                </a>
+                            </li>
+                            <li>
                                 <a class="collapsible-header" href="#!" id="ancrResetPassword">
-                                    Reset Password<i class="material-icons">lock_outline</i>
+                                    Reset Password <i class="material-icons">lock_outline</i>
                                 </a>
                             </li>
                         </ul>
