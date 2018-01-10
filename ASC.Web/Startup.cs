@@ -16,6 +16,13 @@ using ElCamino.AspNetCore.Identity.AzureTable.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
+using ASC.DataAccess.Interfaces;
+using ASC.DataAccess;
+using System.Reflection;
+using ASC.Business.Interfaces;
+using ASC.Business;
+using AutoMapper;
+using Newtonsoft.Json.Serialization;
 
 namespace ASC.Web
 {
@@ -65,21 +72,38 @@ namespace ASC.Web
             services.AddOptions();
             services.Configure<ApplicationSettings>(Configuration.GetSection("AppSettings"));
 
-            services.AddDistributedMemoryCache();
+            //services.AddDistributedMemoryCache();
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetSection("CacheSettings:CacheConnectionString").Value;
+                options.InstanceName = Configuration.GetSection("CacheSettings:CacheInstance").Value;
+            });
+
             services.AddSession();
 
-            services.AddMvc();
+            services.AddMvc().AddJsonOptions(
+                options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+
+            services.AddAutoMapper();
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
             services.AddSingleton<IIdentitySeed, IdentitySeed>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IUnitOfWork>(p => 
+                new UnitOfWork(Configuration.GetSection("ConnectionStrings:DefaultConnection").Value));
+            services.AddScoped<IMasterDataOperations, MasterDataOperations>();
+            services.AddSingleton<IMasterDataCacheOperations, MasterDataCacheOperations>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, IHostingEnvironment env,
-            ILoggerFactory loggerFactory, IIdentitySeed storageSeed)
+        public async void Configure(IApplicationBuilder app,
+            IHostingEnvironment env,
+            ILoggerFactory loggerFactory,
+            IIdentitySeed storageSeed,
+            IMasterDataCacheOperations masterDataCacheOperations,
+            IUnitOfWork unitOfWork)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -117,6 +141,19 @@ namespace ASC.Web
             await storageSeed.Seed(app.ApplicationServices.GetService<UserManager<ApplicationUser>>(),
                 app.ApplicationServices.GetService<RoleManager<IdentityRole>>(),
                 app.ApplicationServices.GetService<IOptions<ApplicationSettings>>());
+
+            IEnumerable<Type> models = Assembly.Load(new AssemblyName("ASC.Models")).GetTypes()
+                .Where(type => type.Namespace == "ASC.Models.Models");
+            foreach (Type model in models)
+            {
+                Object repositoryInstance = Activator.CreateInstance(typeof(Repository<>)
+                    .MakeGenericType(model), unitOfWork);
+                MethodInfo method = typeof(Repository<>).MakeGenericType(model)
+                    .GetMethod("CreateTableAsync");
+                method.Invoke(repositoryInstance, new object[0]);
+            }
+
+            await masterDataCacheOperations.CreateMasterDataCacheAsync();
         }
     }
 }

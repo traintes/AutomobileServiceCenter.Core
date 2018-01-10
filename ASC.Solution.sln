@@ -5,15 +5,17 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASC.Web", "ASC.Web\ASC.Web.csproj", "{397A186B-7C3A-45D8-BC69-BEB395D5AB31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASC.DataAccess", "ASC.DataAccess\ASC.DataAccess.csproj", "{B27428CC-430D-45FC-B5F7-AAE9128C48FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASC.DataAccess", "ASC.DataAccess\ASC.DataAccess.csproj", "{B27428CC-430D-45FC-B5F7-AAE9128C48FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASC.Models", "ASC.Models\ASC.Models.csproj", "{C792B95D-8E4B-4E1C-9141-6BDE11792905}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASC.Models", "ASC.Models\ASC.Models.csproj", "{C792B95D-8E4B-4E1C-9141-6BDE11792905}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASC.Utilities", "ASC.Utilities\ASC.Utilities.csproj", "{DA7B3A0B-3746-4DF7-8099-1C856565365A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASC.Utilities", "ASC.Utilities\ASC.Utilities.csproj", "{DA7B3A0B-3746-4DF7-8099-1C856565365A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureStorageTest", "AzureStorageTest\AzureStorageTest.csproj", "{BA883BBF-7D69-4CA2-90B0-983B4395900F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASC.Tests", "ASC.Tests\ASC.Tests.csproj", "{048C1B97-DC02-4DE8-B83C-9E91F72BC1CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASC.Tests", "ASC.Tests\ASC.Tests.csproj", "{048C1B97-DC02-4DE8-B83C-9E91F72BC1CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASC.Business", "ASC.Business\ASC.Business.csproj", "{D9FC4DAD-B5BF-4D94-B21E-FAF21C081782}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{048C1B97-DC02-4DE8-B83C-9E91F72BC1CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{048C1B97-DC02-4DE8-B83C-9E91F72BC1CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{048C1B97-DC02-4DE8-B83C-9E91F72BC1CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9FC4DAD-B5BF-4D94-B21E-FAF21C081782}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9FC4DAD-B5BF-4D94-B21E-FAF21C081782}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9FC4DAD-B5BF-4D94-B21E-FAF21C081782}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9FC4DAD-B5BF-4D94-B21E-FAF21C081782}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
