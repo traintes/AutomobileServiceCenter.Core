@@ -45,9 +45,17 @@ namespace ASC.Web.Controllers
         //    return View();
         //}
 
-        //public IActionResult Error()
-        //{
-        //    return View();
-        //}
+        public IActionResult Error(string id)
+        {
+            if (id == "404")
+                return View("NotFound");
+
+            if (id == "401" && User.Identity.IsAuthenticated)
+                return View("AccessDenied");
+            else
+                return RedirectToAction("Login", "Account");
+
+            //return View();
+        }
     }
 }

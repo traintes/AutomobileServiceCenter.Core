@@ -21,5 +21,14 @@ namespace ASC.Web.Controllers
         {
             return View();
         }
+
+        // TODO Remove!
+        public IActionResult TestException()
+        {
+            int i = 0;
+            // Should throw Divide by zero error
+            int j = 1 / i;
+            return View();
+        }
     }
 }

@@ -26,8 +26,8 @@ namespace ASC.Web.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
-        private readonly ILogger _logger;
         private readonly string _externalCookieScheme;
+        private readonly ILogger<AccountController> _logger;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -35,14 +35,14 @@ namespace ASC.Web.Controllers
             IOptions<IdentityCookieOptions> identityCookieOptions,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ILogger<AccountController> logger)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
-            _emailSender = emailSender;
-            _smsSender = smsSender;
-            _logger = loggerFactory.CreateLogger<AccountController>();
+            this._userManager = userManager;
+            this._signInManager = signInManager;
+            this._externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
+            this._emailSender = emailSender;
+            this._smsSender = smsSender;
+            this._logger = logger;
         }
 
         //
