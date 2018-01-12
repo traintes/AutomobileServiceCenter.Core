@@ -1,5 +1,4 @@
-﻿@using ASC.Web.Models.MasterDataViewModels
-@model MasterValuesViewModel
+﻿@model ASC.Web.Areas.Configuration.Models.MasterValuesViewModel
 @{
     Layout = "_SecureLayout";
 }
@@ -300,7 +299,7 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: '/MasterData/UploadExcel',
+                    url: '@Url.Action("UploadExcel", "MasterData")',
                     contentType: false,
                     processData: false,
                     data: data,

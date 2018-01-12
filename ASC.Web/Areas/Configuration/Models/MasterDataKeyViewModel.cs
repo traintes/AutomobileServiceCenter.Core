@@ -4,16 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ASC.Web.Models.MasterDataViewModels
+namespace ASC.Web.Areas.Configuration.Models
 {
-    public class MasterDataValueViewModel
+    public class MasterDataKeyViewModel
     {
         public string RowKey { get; set; }
-
-        [Required]
-        [Display(Name = "Partition Key")]
         public string PartitionKey { get; set; }
-
         public bool IsActive { get; set; }
 
         [Required]

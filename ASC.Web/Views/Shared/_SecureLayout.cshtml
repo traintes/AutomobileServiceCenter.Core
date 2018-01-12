@@ -40,7 +40,8 @@
             </div>
         </li>
         <li>
-            <a class="collapsible-header" href="#!">
+            <a asp-area="ServiceRequests" asp-controller="Dashboard" asp-action="Dashboard"
+                class="collapsible-header">
                 <i class="material-icons">dashboard</i>Dashboard
             </a>
         </li>
@@ -54,12 +55,12 @@
                     <div class="collapsible-body">
                         <ul>
                             <li>
-                                <a asp-controller="Account" asp-action="Customers">
+                                <a asp-area="Accounts" asp-controller="Account" asp-action="Customers">
                                     Customers <i class="material-icons">account_box</i>
                                 </a>
                             </li>
                             <li>
-                                <a asp-controller="Account" asp-action="ServiceEngineers">
+                                <a asp-area="Accounts" asp-controller="Account" asp-action="ServiceEngineers">
                                     Service Engineers <i class="material-icons">person_add</i>
                                 </a>
                             </li>
@@ -92,12 +93,14 @@
                     <div class="collapsible-body">
                         <ul>
                             <li>
-                                <a asp-controller="MasterData" asp-action="MasterKeys" class="collapsible-header">
+                                <a asp-area="Configuration" asp-controller="MasterData"
+                                    asp-action="MasterKeys" class="collapsible-header">
                                     Master Keys <i class="material-icons">data_usage</i>
                                 </a>
                             </li>
                             <li>
-                                <a asp-controller="MasterData" asp-action="MasterValues" class="collapsible-header">
+                                <a asp-area="Configuration" asp-controller="MasterData"
+                                    asp-action="MasterValues" class="collapsible-header">
                                     Master Values <i class="material-icons">settings_system_daydream</i>
                                 </a>
                             </li>
@@ -115,7 +118,8 @@
                     <div class="collapsible-body">
                         <ul>
                             <li>
-                                <a asp-controller="Account" asp-action="Profile" class="collapsible-header">
+                                <a asp-area="Accounts" asp-controller="Account" asp-action="Profile"
+                                    class="collapsible-header">
                                     Profile <i class="material-icons">system_update_alt</i>
                                 </a>
                             </li>
@@ -191,12 +195,12 @@
     </div>
 </footer>
 
-<form class="hide" method="post" id="logout_form" asp-controller="Account" asp-action="Logout">
+<form asp-area="" asp-controller="Account" asp-action="Logout" class="hide" method="post" id="logout_form" >
     <input type="submit" value="Logout" />
 </form>
 
-<form class="hide" method="post" id="resetPassword_form" asp-controller="Account"
-    asp-action="InitiateResetPassword"></form>
+<form asp-area="" asp-controller="Account" asp-action="InitiateResetPassword" class="hide"
+    method="post" id="resetPassword_form"></form>
 
 @section Scripts {
     @RenderSection("Scripts", required: false)

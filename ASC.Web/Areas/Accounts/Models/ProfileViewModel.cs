@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ASC.Web.Models.AccountViewModels
+namespace ASC.Web.Areas.Accounts.Models
 {
     public class ProfileViewModel
     {

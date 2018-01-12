@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ASC.Web.Models.MasterDataViewModels
+namespace ASC.Web.Areas.Configuration.Models
 {
     public class MasterValuesViewModel
     {

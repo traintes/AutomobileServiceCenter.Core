@@ -1,9 +1,10 @@
-﻿using System;
+﻿using ASC.Web.Models.AccountViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ASC.Web.Models.AccountViewModels
+namespace ASC.Web.Areas.Accounts.Models
 {
     public class ServiceEngineerRegistrationViewModel : RegisterViewModel
     {
