@@ -25,6 +25,8 @@ using AutoMapper;
 using Newtonsoft.Json.Serialization;
 using ASC.Web.Logger;
 using ASC.Web.Filters;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Mvc.Razor;
 
 namespace ASC.Web
 {
@@ -90,6 +92,15 @@ namespace ASC.Web
 
             services.AddAutoMapper();
 
+            // Add support to embedded views from ASC.Utilities project.
+            Assembly assembly = typeof(ASC.Utilities.Navigation.LeftNavigationViewComponent)
+                .GetTypeInfo().Assembly;
+            EmbeddedFileProvider embeddedFileProvider = new EmbeddedFileProvider(assembly, "ASC.Utilities");
+            services.Configure<RazorViewEngineOptions>(options =>
+            {
+                options.FileProviders.Add(embeddedFileProvider);
+            });
+
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
@@ -101,6 +112,7 @@ namespace ASC.Web
             services.AddSingleton<IMasterDataCacheOperations, MasterDataCacheOperations>();
             services.AddScoped<ILogDataOperations, LogDataOperations>();
             services.AddScoped<CustomExceptionFilter>();
+            services.AddSingleton<INavigationCacheOperations, NavigationCacheOperations>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -110,6 +122,7 @@ namespace ASC.Web
             IIdentitySeed storageSeed,
             IMasterDataCacheOperations masterDataCacheOperations,
             ILogDataOperations logDataOperations,
+            INavigationCacheOperations navigationCacheOperations,
             IUnitOfWork unitOfWork)
         {
             //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
@@ -171,6 +184,8 @@ namespace ASC.Web
             }
 
             await masterDataCacheOperations.CreateMasterDataCacheAsync();
+
+            await navigationCacheOperations.CreateNavigationCacheAsync();
         }
     }
 }
