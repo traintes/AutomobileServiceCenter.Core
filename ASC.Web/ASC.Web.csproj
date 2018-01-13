@@ -58,9 +58,9 @@
     </Content>
   </ItemGroup>
 
-  <Target Name="PreBuildScript" BeforeTargets="Build">
+  <!--<Target Name="PreBuildScript" BeforeTargets="Build">
     <Exec Command="dotnet bundle clean" />
     <Exec Command="dotnet bundle" />
-  </Target>
+  </Target>-->
 
 </Project>
