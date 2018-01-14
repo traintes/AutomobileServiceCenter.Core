@@ -86,6 +86,23 @@ namespace ASC.DataAccess
             return result.Results as IEnumerable<T>;
         }
 
+        public async Task<IEnumerable<T>> FindAllByQuery(string query)
+        {
+            TableContinuationToken tableContinuationToken = null;
+            TableQuerySegment<T> result = await this.storageTable.ExecuteQuerySegmentedAsync(new TableQuery<T>().
+                Where(query), tableContinuationToken);
+            return result.Results as IEnumerable<T>;
+        }
+
+        public async Task<IEnumerable<T>> FindAllInAuditByQuery(string query)
+        {
+            CloudTable auditTable = this.tableClient.GetTableReference($"{typeof(T).Name}Audit");
+            TableContinuationToken tableContinuationToken = null;
+            TableQuerySegment<T> result = await auditTable.ExecuteQuerySegmentedAsync(new TableQuery<T>()
+                .Take(20).Where(query), tableContinuationToken);
+            return result.Results as IEnumerable<T>;
+        }
+
         public async Task CreateTableAsync()
         {
             CloudTable table = this.tableClient.GetTableReference(typeof(T).Name);

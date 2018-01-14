@@ -126,6 +126,14 @@ header.secureLayout, main.secureLayout, footer.secureLayout {
   cursor: pointer;
 }
 
+.height-300px {
+  height: 300px;
+}
+
+.overflow-y {
+  overflow-y: auto;
+}
+
 
 /* Bugfix for non-clickable checkboxes in Materialize
   See: https://github.com/Dogfalo/materialize/issues/5062

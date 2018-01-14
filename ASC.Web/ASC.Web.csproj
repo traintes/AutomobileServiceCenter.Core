@@ -49,10 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\ServiceRequests\Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="Navigation\Navigation.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

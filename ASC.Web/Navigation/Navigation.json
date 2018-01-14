@@ -39,12 +39,22 @@
     },
     {
       "DisplayName": "Service Requests",
-      "MaterialIcon": "perm_data_setting",
-      "Link": "/ServiceRequests/Dashboard/Dashboard",
-      "IsNested": false,
+      "MaterialIcon": "local_laundry_service",
+      "Link": "",
+      "IsNested": true,
       "Sequence": 3,
       "UserRoles": [ "User", "Engineer", "Admin" ],
-      "NestedItems": []
+      "NestedItems": [
+        {
+          "DisplayName": "New Service Request",
+          "MaterialIcon": "insert_invitation",
+          "Link": "/ServiceRequests/ServiceRequest/ServiceRequest",
+          "IsNested": false,
+          "Sequence": 1,
+          "UserRoles": [ "User", "Engineer", "Admin" ],
+          "NestedItems": []
+        }
+      ]
     },
     {
       "DisplayName": "Service Notifications",

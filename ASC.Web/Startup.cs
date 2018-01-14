@@ -113,6 +113,7 @@ namespace ASC.Web
             services.AddScoped<ILogDataOperations, LogDataOperations>();
             services.AddScoped<CustomExceptionFilter>();
             services.AddSingleton<INavigationCacheOperations, NavigationCacheOperations>();
+            services.AddScoped<IServiceRequestOperations, ServiceRequestOperations>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
