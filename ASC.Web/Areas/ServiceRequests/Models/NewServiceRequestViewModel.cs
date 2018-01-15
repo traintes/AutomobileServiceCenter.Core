@@ -10,7 +10,7 @@ namespace ASC.Web.Areas.ServiceRequests.Models
 {
     public class NewServiceRequestViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Error_VehicleName_Message")]
         [Display(Name = "Vehicle Name")]
         public string VehicleName { get; set; }
 

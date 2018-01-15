@@ -90,9 +90,16 @@
     </div>
     <div class="footer-copyright row margin-bottom-0px">
         <div class="col s12">
-            Powered by <a class="brown-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+            <div class="col s8">
+                Powered by
+                <a class="brown-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+            </div>
+            <div class="col s4">
+                @await Html.PartialAsync("_SelectCulture")
+            </div>
         </div>
     </div>
+    <div class="footer-copyright row margin-bottom-0px"></div>
 </footer>
 
 <form asp-area="" asp-controller="Account" asp-action="Logout" class="hide" method="post" id="logout_form" >

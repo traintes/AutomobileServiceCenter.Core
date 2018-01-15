@@ -18,6 +18,8 @@
       $(window).on('contextmenu', function () {
         return false;
       });
+
+      $('#selectCulture').material_select();
     });
   }); // end of document ready
 

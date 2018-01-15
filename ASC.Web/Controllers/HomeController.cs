@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using ASC.Utilities;
 using ASC.Web.Configuration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -29,6 +31,18 @@ namespace ASC.Web.Controllers
             ViewBag.Title = this._settings.Value.ApplicationTitle;
 
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult SetCulture(string culture, string returnUrl)
+        {
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                new CookieOptions { Expires = DateTime.UtcNow.AddYears(1) }
+            );
+
+            return LocalRedirect(returnUrl);
         }
 
         //public IActionResult About()

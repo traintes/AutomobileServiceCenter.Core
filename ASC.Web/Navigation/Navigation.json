@@ -53,6 +53,15 @@
           "Sequence": 1,
           "UserRoles": [ "User", "Engineer", "Admin" ],
           "NestedItems": []
+        },
+        {
+          "DisplayName": "Search Service Request",
+          "MaterialIcon": "search",
+          "Link": "/ServiceRequests/ServiceRequest/SearchServiceRequests",
+          "IsNested": false,
+          "Sequence": 2,
+          "UserRoles": [ "Engineer", "Admin" ],
+          "NestedItems": []
         }
       ]
     },

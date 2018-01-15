@@ -6,6 +6,7 @@ using ASC.Web.Areas.ServiceRequests.Models;
 using ASC.Web.Controllers;
 using ASC.Web.Data;
 using ASC.Web.Models;
+using ASC.Web.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -23,14 +24,19 @@ namespace ASC.Web.Areas.ServiceRequests.Controllers
         private readonly IMapper _mapper;
         private readonly IMasterDataCacheOperations _masterData;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailSender _emailSender;
 
-        public ServiceRequestController(IServiceRequestOperations operations, IMapper mapper,
-            IMasterDataCacheOperations masterData, UserManager<ApplicationUser> userManager)
+        public ServiceRequestController(IServiceRequestOperations operations,
+            IMapper mapper,
+            IMasterDataCacheOperations masterData,
+            UserManager<ApplicationUser> userManager,
+            IEmailSender emailSender)
         {
             this._serviceRequestOperations = operations;
             this._mapper = mapper;
             this._masterData = masterData;
             this._userManager = userManager;
+            this._emailSender = emailSender;
         }
 
         [HttpGet]
@@ -131,6 +137,15 @@ namespace ASC.Web.Areas.ServiceRequests.Controllers
 
             await this._serviceRequestOperations.UpdateServiceRequestAsync(originalServiceRequest);
 
+            if ((HttpContext.User.IsInRole(Roles.Admin.ToString()) ||
+                HttpContext.User.IsInRole(Roles.Engineer.ToString())) &&
+                originalServiceRequest.Status == Status.PendingCustomerApproval.ToString())
+            {
+                await this._emailSender.SendEmailAsync(originalServiceRequest.PartitionKey,
+                    "Your Service Request is almost completed!",
+                    "Please visit the ASC application and review your Service request.");
+            }
+
             return RedirectToAction("ServiceRequestDetails", "ServiceRequest", new
             {
                 Area = "ServiceRequests",
@@ -149,6 +164,32 @@ namespace ASC.Web.Areas.ServiceRequests.Controllers
                 return Json(data: "There is a denied service request for you in last 90 days. " +
                     "Please contact ASC Admin.");
             return Json(data: true);
+        }
+
+        [HttpGet]
+        public IActionResult SearchServiceRequests()
+        {
+            return View(new SearchServiceRequestsViewModel());
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchServiceRequestResults(string email, DateTime? requestedDate)
+        {
+            List<ServiceRequest> results = new List<ServiceRequest>();
+            if (string.IsNullOrEmpty(email) && !requestedDate.HasValue)
+                return Json(new { data = results });
+
+            if (HttpContext.User.IsInRole(Roles.Admin.ToString()))
+                results = await this._serviceRequestOperations
+                    .GetServiceRequestsByRequestedDateAndStatus(requestedDate, null, email);
+            else
+            {
+                results = await this._serviceRequestOperations
+                    .GetServiceRequestsByRequestedDateAndStatus(requestedDate, null, email,
+                        HttpContext.User.GetCurrentUserDetails().Email);
+            }
+
+            return Json(new { data = results.OrderByDescending(p => p.RequestedDate).ToList() });
         }
     }
 }

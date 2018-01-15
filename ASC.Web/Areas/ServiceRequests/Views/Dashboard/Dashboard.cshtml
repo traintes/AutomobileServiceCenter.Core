@@ -1,5 +1,7 @@
 @using ASC.Models.BaseTypes
 @using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<SharedResources> SharedLocalizer
 @inject IHttpContextAccessor UserHttpContext
 @model ASC.Web.Areas.ServiceRequests.Models.DashboardViewModel
 @{
@@ -9,21 +11,21 @@
 <div class="row"></div>
 @await Html.PartialAsync("_ServiceRequestGrid", Model.ServiceRequests, new ViewDataDictionary(ViewData)
 {
-    { "SectionName", "Service Requests" },
-    { "Id", "tblServiceRequests" },
-    { "IsAudit", false },
+{ "SectionName", SharedLocalizer["SectionHeader_ServiceRequests_Text"] },
+{ "Id", "tblServiceRequests" },
+{ "IsAudit", false },
 })
 
 @if (this.UserHttpContext.HttpContext.User.IsInRole(Roles.Admin.ToString()) ||
-    this.UserHttpContext.HttpContext.User.IsInRole(Roles.Engineer.ToString()))
+   this.UserHttpContext.HttpContext.User.IsInRole(Roles.Engineer.ToString()))
 {
     @await Html.PartialAsync("_ServiceRequestGrid", Model.AuditServiceRequests,
-        new ViewDataDictionary(ViewData)
-        {
-            { "SectionName", "Recent Updates" },
-            { "Id", "tblAuditServiceRequests" },
-            { "IsAudit", true },
-        });
+            new ViewDataDictionary(ViewData)
+            {
+{ "SectionName", "Recent Updates" },
+{ "Id", "tblAuditServiceRequests" },
+{ "IsAudit", true },
+            });
 }
 
 @if (this.UserHttpContext.HttpContext.User.IsInRole(Roles.Admin.ToString()))
@@ -36,7 +38,7 @@
                 </li>
                 @if (Model.ActiveServiceRequests.Any())
                 {
-                    @foreach(KeyValuePair<string, int> activeServiceRequest in Model.ActiveServiceRequests)
+                    @foreach (KeyValuePair<string, int> activeServiceRequest in Model.ActiveServiceRequests)
                     {
                         <li class="collection-item">
                             <div>

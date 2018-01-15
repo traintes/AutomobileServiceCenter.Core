@@ -27,6 +27,8 @@ using ASC.Web.Logger;
 using ASC.Web.Filters;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Mvc.Razor;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 namespace ASC.Web
 {
@@ -86,9 +88,32 @@ namespace ASC.Web
 
             services.AddSession();
 
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+
             services.AddMvc(o => { o.Filters.Add(typeof(CustomExceptionFilter)); })
-                .AddJsonOptions(options 
-                    => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+                .AddJsonOptions(options
+                    => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix,
+                    options => { options.ResourcesPath = "Resources"; })
+                .AddDataAnnotationsLocalization(options => {
+                    options.DataAnnotationLocalizerProvider =
+                        (type, factory) => factory.Create(typeof(SharedResources));
+                });
+
+            services.Configure<RequestLocalizationOptions>(opts =>
+            {
+                List<CultureInfo> supportedCultures = new List<CultureInfo>
+                {
+                    new CultureInfo("en-US"),
+                    new CultureInfo("es-MX")
+                };
+
+                opts.DefaultRequestCulture = new RequestCulture("en-US");
+                // Formatting numbers, dates, etc.
+                opts.SupportedCultures = supportedCultures;
+                // UI strings that we have localized.
+                opts.SupportedUICultures = supportedCultures;
+            });
 
             services.AddAutoMapper();
 
@@ -145,6 +170,10 @@ namespace ASC.Web
             {
                 //app.UseExceptionHandler("/Home/Error");
             }
+
+            IOptions<RequestLocalizationOptions> options =
+                app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(options.Value);
 
             app.UseStatusCodePagesWithRedirects("/Home/Error/{0}");
             app.UseSession();
