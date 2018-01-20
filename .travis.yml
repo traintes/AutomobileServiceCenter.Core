@@ -2,7 +2,7 @@ language: csharp
 dist: trusty
 sudo: required
 mono: none
-dotnet: 1.1.2
+dotnet: 1.1.7
 script:
   - dotnet restore -s https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json -s https://api.nuget.org/v3/index.json
   - dotnet test ./ASC.Tests/ASC.Tests.csproj
