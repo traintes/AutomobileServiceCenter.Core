@@ -6,6 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace ASC.Web.Services
 {
@@ -41,10 +44,13 @@ namespace ASC.Web.Services
             }
         }
 
-        public Task SendSmsAsync(string number, string message)
+        public async Task SendSmsAsync(string number, string message)
         {
-            // Plug in your SMS service here to send a text message.
-            return Task.FromResult(0);
+            TwilioClient.Init(this._settings.Value.TwilioAccountSID, this._settings.Value.TwilioAuthToken);
+            var smsMessage = await MessageResource.CreateAsync(
+                to: new PhoneNumber(number),
+                from: new PhoneNumber(this._settings.Value.TwilioPhoneNumber),
+                body: message);
         }
     }
 }

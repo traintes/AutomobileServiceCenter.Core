@@ -20,5 +20,9 @@ namespace ASC.Web.Configuration
         public int SMTPPort { get; set; }
         public string SMTPAccount { get; set; }
         public string SMTPPassword { get; set; }
+
+        public string TwilioAccountSID { get; set; }
+        public string TwilioAuthToken { get; set; }
+        public string TwilioPhoneNumber { get; set; }
     }
 }

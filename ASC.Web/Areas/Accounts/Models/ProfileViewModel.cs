@@ -12,6 +12,10 @@ namespace ASC.Web.Areas.Accounts.Models
         [Display(Name = "Username")]
         public string Username { get; set; }
 
+        [Required]
+        [Display(Name = "Mobile")]
+        public string Phone { get; set; }
+
         public bool IsEditSuccess { get; set; }
     }
 }

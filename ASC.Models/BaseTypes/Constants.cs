@@ -25,6 +25,7 @@ namespace ASC.Models.BaseTypes
     {
         VehicleName,
         VehicleType,
+        PromotionType,
     }
 
     public enum Status

@@ -42,7 +42,8 @@
             </div>
         </li>
         @await Component.InvokeAsync("ASC.Utilities.Navigation.LeftNavigation",
-            await navigationCache.GetNavigationCacheAsync());
+                           await navigationCache.GetNavigationCacheAsync());
+        <a id="serviceNotification"></a>
     </ul>
 </header>
 
@@ -102,22 +103,84 @@
     <div class="footer-copyright row margin-bottom-0px"></div>
 </footer>
 
-<form asp-area="" asp-controller="Account" asp-action="Logout" class="hide" method="post" id="logout_form" >
+<form asp-area="" asp-controller="Account" asp-action="Logout" class="hide" method="post" id="logout_form">
     <input type="submit" value="Logout" />
 </form>
 
 <form asp-area="" asp-controller="Account" asp-action="InitiateResetPassword" class="hide"
-    method="post" id="resetPassword_form"></form>
+      method="post" id="resetPassword_form"></form>
+
+<!-- Tap Target Structure -->
+<div class="tap-target cyan hide" data-activates="serviceNotification">
+    <div class="tap-target-content white-text">
+        <h5 class="padding-left-50px">Status Updated</h5>
+        <p class="white-text padding-left-50px divNotification">
+            The Status of your Service Request has been changed to {$}.
+        </p>
+    </div>
+</div>
+
+<!-- Promotion Template -->
+<div class="promotionTemplate hide">
+    <div class="col s12 m5">
+        <div class="card {Style}">
+            <div class="card-content white-text">
+                <span class="card-title">{Header}</span>
+                <p>{Content}</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     @RenderSection("Scripts", required: false)
+    <!-- TODO: Source from wwwroot -->
+    <script src="http://ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.min.js"></script>
+    <script src="/signalr/hubs"></script>
     <script type="text/javascript">
-        $('#ancrLogout').click(function () {
-            $('#logout_form').submit();
-        });
+        $(function () {
+            $('#ancrLogout').click(function () {
+                $('#logout_form').submit();
+            });
 
-        $('#ancrResetPassword').click(function () {
-            $('#resetPassword_form').submit();
+            $('#ancrResetPassword').click(function () {
+                $('#resetPassword_form').submit();
+            });
+
+            $.connection.serviceMessagesHub.client.publishNotification = showNotification;
+            $.connection.serviceMessagesHub.client.publishPromotion = showPromotion;
+
+            function showNotification(data) {
+                var notificationText = $('.divNotification').html();
+                $('.divNotification').html(notificationText.replace('{$}', data.status));
+                $('.tap-target').removeClass('hide');
+
+                $('.tap-target').tapTarget('open');
+                setTimeout(function () {
+                    $('.tap-target').tapTarget('close');
+                    $('.tap-target').addClass('hide');
+                }, 5000);
+            };
+
+            var counter = 0;
+            function showPromotion(data) {
+                counter++;
+                var promotionTemplate = $('.promotionTemplate').clone().html();
+                promotionTemplate = promotionTemplate.replace('{Header}', data.Header);
+                promotionTemplate = promotionTemplate.replace('{Content}', data.Content);
+                promotionTemplate = promotionTemplate.replace('{Style}', data.PartitionKey === 'Discount' ?
+                    'light-green darken-2' : 'light-blue darken-2');
+
+                // Prepend newly added promotion to divPromotions on Promotions view.
+                $('.divPromotions').prepend(promotionTemplate);
+
+                // Show notification counter on the left navigation menu item.
+                $('#ancrPromotions .badge').remove();
+                $('#ancrPromotions').prepend('<span class="new badge">' + counter + '</span>');
+            }
+
+            // Start the client side HUB
+            $.connection.hub.start();
         });
     </script>
 }

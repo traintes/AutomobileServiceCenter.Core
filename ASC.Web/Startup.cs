@@ -90,6 +90,8 @@ namespace ASC.Web
 
             services.AddLocalization(options => options.ResourcesPath = "Resources");
 
+            services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
+
             services.AddMvc(o => { o.Filters.Add(typeof(CustomExceptionFilter)); })
                 .AddJsonOptions(options
                     => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
@@ -139,6 +141,9 @@ namespace ASC.Web
             services.AddScoped<CustomExceptionFilter>();
             services.AddSingleton<INavigationCacheOperations, NavigationCacheOperations>();
             services.AddScoped<IServiceRequestOperations, ServiceRequestOperations>();
+            services.AddScoped<IServiceRequestMessageOperations, ServiceRequestMessageOperations>();
+            services.AddScoped<IOnlineUsersOperations, OnlineUsersOperations>();
+            services.AddScoped<IPromotionOperations, PromotionOperations>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -197,6 +202,9 @@ namespace ASC.Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            app.UseWebSockets();
+            app.UseSignalR();
 
             await storageSeed.Seed(app.ApplicationServices.GetService<UserManager<ApplicationUser>>(),
                 app.ApplicationServices.GetService<RoleManager<IdentityRole>>(),

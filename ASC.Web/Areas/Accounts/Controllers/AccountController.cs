@@ -189,6 +189,7 @@ namespace ASC.Web.Areas.Accounts.Controllers
             return View(new ProfileViewModel
             {
                 Username = user.UserName,
+                Phone = user.PhoneNumber,
                 IsEditSuccess = false,
             });
         }
@@ -200,6 +201,7 @@ namespace ASC.Web.Areas.Accounts.Controllers
             ApplicationUser user = await this._userManager
                 .FindByEmailAsync(HttpContext.User.GetCurrentUserDetails().Email);
             user.UserName = profile.Username;
+            user.PhoneNumber = profile.Phone;
             IdentityResult result = await this._userManager.UpdateAsync(user);
             await this._signInManager.SignOutAsync();
             await this._signInManager.SignInAsync(user, false);
